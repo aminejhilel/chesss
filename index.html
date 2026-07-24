@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grandmaster Noir | Professional Chess</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="logo">
+                <i data-lucide="trophy" class="logo-icon"></i>
+                <h1>Grandmaster<span>Noir</span></h1>
+            </div>
+            <div class="status-panel">
+                <div id="player-status" class="status-indicator">
+                    <span class="pulse"></span>
+                    <span id="game-status-text">White's Turn</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="game-layout">
+            <section class="board-section">
+                <div class="captured-area opponent-captured" id="captured-white">
+                    <!-- Captured white pieces (shown to black) -->
+                </div>
+                
+                <div class="chess-board-wrapper">
+                    <div id="board" class="chess-board"></div>
+                    <div class="coordinates-rank">
+                        <span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span>
+                    </div>
+                    <div class="coordinates-file">
+                        <span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span>
+                    </div>
+                </div>
+
+                <div class="captured-area player-captured" id="captured-black">
+                    <!-- Captured black pieces (shown to white) -->
+                </div>
+            </section>
+
+            <aside class="sidebar-section">
+                <div class="stats-card glass">
+                    <div class="card-header">
+                        <h3>Game Info</h3>
+                        <i data-lucide="info"></i>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="label">Time Control</span>
+                            <span class="value">Unlimited</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Phase</span>
+                            <span id="game-phase" class="value">Opening</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="history-card glass">
+                    <div class="card-header">
+                        <h3>Move History</h3>
+                        <i data-lucide="history"></i>
+                    </div>
+                    <div id="move-history" class="history-list">
+                        <!-- Moves will be appended here -->
+                    </div>
+                </div>
+
+                <div class="controls-card glass">
+                    <button id="btn-undo" class="btn secondary">
+                        <i data-lucide="undo-2"></i> Undo
+                    </button>
+                    <button id="btn-reset" class="btn danger">
+                        <i data-lucide="rotate-ccw"></i> Reset
+                    </button>
+                    <button id="btn-settings" class="btn icon-only glass">
+                        <i data-lucide="settings"></i>
+                    </button>
+                </div>
+            </aside>
+        </main>
+
+        <footer class="app-footer">
+            <p>&copy; 2026 Grandmaster Noir. Designed for Excellence.</p>
+        </footer>
+    </div>
+
+    <!-- Modal for Pawn Promotion -->
+    <div id="promotion-modal" class="modal-overlay hidden">
+        <div class="modal glass">
+            <h2>Pawn Promotion</h2>
+            <div class="promotion-choices">
+                <div class="choice" data-piece="q"><i data-lucide="crown"></i><span>Queen</span></div>
+                <div class="choice" data-piece="r"><i data-lucide="castle"></i><span>Rook</span></div>
+                <div class="choice" data-piece="b"><i data-lucide="swords"></i><span>Bishop</span></div>
+                <div class="choice" data-piece="n"><i data-lucide="horse"></i><span>Knight</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <!-- Core Modules -->
+    <script src="logic.js"></script>
+    <script src="ui.js"></script>
+    <script src="script.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

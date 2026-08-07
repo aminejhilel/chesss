@@ -58,6 +58,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    const themeButton = document.getElementById('btn-theme');
+    const themeButtonText = document.getElementById('theme-button-text');
+
+    function applyTheme(theme) {
+        document.body.dataset.theme = theme;
+        themeButtonText.textContent = theme === 'light' ? 'Dark Mode' : 'Light Mode';
+    }
+
+    function loadThemePreference() {
+        const savedTheme = localStorage.getItem('chess_theme') || 'dark';
+        applyTheme(savedTheme);
+    }
+
+    themeButton.addEventListener('click', () => {
+        const nextTheme = document.body.dataset.theme === 'light' ? 'dark' : 'light';
+        localStorage.setItem('chess_theme', nextTheme);
+        applyTheme(nextTheme);
+    });
+
     function executeMove(moveObj) {
         const move = logic.makeMove(moveObj);
         if (move) {
@@ -94,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize UI
     ui = new ChessUI('board', handleSquareClick);
+    loadThemePreference();
     loadGame(); // Try to load saved game
     if (!localStorage.getItem('chess_game_pgn')) ui.render(logic.getBoard());
 

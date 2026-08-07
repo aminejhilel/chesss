@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,10 +9,13 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@300;400;600;800&display=swap"
+        rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
+
 <body>
     <div class="app-container">
         <header class="app-header">
@@ -25,6 +29,12 @@
                     <span id="game-status-text">White's Turn</span>
                 </div>
             </div>
+            <div class="header-actions">
+                <button id="btn-theme" class="btn secondary">
+                    <i data-lucide="sun"></i>
+                    <span id="theme-button-text">Light Mode</span>
+                </button>
+            </div>
         </header>
 
         <main class="game-layout">
@@ -32,7 +42,7 @@
                 <div class="captured-area opponent-captured" id="captured-white">
                     <!-- Captured white pieces (shown to black) -->
                 </div>
-                
+
                 <div class="chess-board-wrapper">
                     <div id="board" class="chess-board"></div>
                     <div class="coordinates-rank">
@@ -118,4 +128,5 @@
         lucide.createIcons();
     </script>
 </body>
+
 </html>

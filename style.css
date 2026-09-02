@@ -175,8 +175,13 @@ h3,
     background: radial-gradient(circle at 30% 15%, rgba(212, 175, 55, 0.18), transparent 35%),
         linear-gradient(180deg, #111519, #1d2430);
     border-radius: 28px;
-    box-shadow: 0 28px 70px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 40px rgba(212, 175, 55, 0.1), 0 28px 70px rgba(0, 0, 0, 0.55), inset 0 0 0 1px rgba(212, 175, 55, 0.15);
     overflow: hidden;
+    transition: box-shadow 0.5s ease;
+}
+
+.chess-board-wrapper:hover {
+    box-shadow: 0 0 60px rgba(212, 175, 55, 0.2), 0 28px 70px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(212, 175, 55, 0.3);
 }
 
 .chess-board-wrapper::before {
@@ -238,12 +243,29 @@ h3,
 }
 
 .legal-move-hint {
-    width: 18px;
-    height: 18px;
-    background: rgba(212, 175, 55, 0.95);
+    width: 24px;
+    height: 24px;
+    background: rgba(0, 0, 0, 0.2);
     border-radius: 50%;
-    box-shadow: 0 0 0 6px rgba(212, 175, 55, 0.12);
     pointer-events: none;
+    z-index: 5;
+}
+
+.legal-move-hint.capture {
+    background: transparent;
+    border: 4px solid rgba(0, 0, 0, 0.2);
+    width: 60px;
+    height: 60px;
+}
+
+.square.in-check {
+    background: radial-gradient(circle, rgba(255,0,0,0.8) 0%, rgba(255,0,0,0) 70%);
+    animation: check-pulse 1s infinite alternate;
+}
+
+@keyframes check-pulse {
+    from { opacity: 0.6; }
+    to { opacity: 1; }
 }
 
 .piece {
@@ -454,31 +476,88 @@ body[data-theme="light"] .chess-board-wrapper {
     filter: brightness(1.2);
 }
 
-/* Captured Area */
+/* Captured Area (now inside player panel) */
 .captured-area {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
-    min-height: 48px;
+    gap: 4px;
+    min-height: 24px;
     width: 100%;
-    max-width: 600px;
-    padding: 14px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.18);
 }
 
 .captured-piece {
-    width: 28px;
-    height: 28px;
-    opacity: 0.95;
-    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.3));
-    transition: transform 0.25s ease;
+    width: 20px;
+    height: 20px;
+    opacity: 0.8;
+    transition: transform 0.2s ease;
 }
 
 .captured-piece:hover {
-    transform: scale(1.05);
+    transform: scale(1.1);
+}
+
+/* Player Panels */
+.player-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+}
+
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    padding: 4px;
+    border: 2px solid var(--border-glass);
+}
+
+.player-details h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.2rem;
+}
+
+.material-score {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.timer {
+    position: absolute;
+    right: 1.5rem;
+    top: 1.5rem;
+    font-size: 1.5rem;
+    font-family: monospace;
+    font-weight: 700;
+    background: rgba(0,0,0,0.3);
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-md);
+    color: var(--text-main);
+}
+
+.timer.low-time {
+    color: var(--danger);
+    animation: flash 1s infinite;
+}
+
+@keyframes flash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
 }
 
 /* Modal */
@@ -529,6 +608,12 @@ body[data-theme="light"] .chess-board-wrapper {
     color: black;
 }
 
+.choice img {
+    width: 48px;
+    height: 48px;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+}
+
 .choice i {
     width: 32px;
     height: 32px;
@@ -543,5 +628,280 @@ body[data-theme="light"] .chess-board-wrapper {
     100% {
         transform: scale(1) translateY(0);
         opacity: 1;
+    }
+}
+
+/* AI Toggle Switch */
+.mode-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    border-radius: 100px;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255,255,255,0.2);
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: var(--accent);
+}
+
+input:checked + .slider:before {
+    transform: translateX(22px);
+}
+
+.slider.round {
+    border-radius: 24px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* Game Over Modal */
+.game-over-modal {
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.game-over-modal h2 {
+    font-size: 2.5rem;
+    color: var(--accent);
+}
+
+.game-over-modal p {
+    font-size: 1.2rem;
+    color: var(--text-main);
+}
+
+.game-over-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.btn.accent {
+    background: linear-gradient(135deg, var(--accent), #f1d570);
+    color: #000;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+}
+
+.btn.accent:hover {
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.6);
+    transform: translateY(-3px);
+}
+
+/* Fullscreen Mode */
+.btn-fullscreen {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--border-glass);
+    background: var(--bg-glass);
+    color: var(--text-main);
+    cursor: pointer;
+    z-index: 100;
+    transition: var(--transition);
+}
+
+.btn-fullscreen i {
+    width: 16px;
+    height: 16px;
+}
+
+.btn-fullscreen:hover {
+    background: var(--accent);
+    color: black;
+    transform: scale(1.1);
+}
+
+.chess-board-wrapper.fullscreen-mode {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    border-radius: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.95);
+    padding: 0;
+    margin: 0;
+}
+
+.chess-board-wrapper.fullscreen-mode .chess-board {
+    transform: scale(1.2);
+}
+
+.chess-board-wrapper.fullscreen-mode .coordinates-rank,
+.chess-board-wrapper.fullscreen-mode .coordinates-file {
+    display: none;
+}
+
+.chess-board-wrapper.fullscreen-mode::before {
+    display: none;
+}
+
+/* Footer & Developer Badge */
+.app-footer {
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-glass);
+    margin-top: auto;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-muted);
+}
+
+.developer-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 0.5rem 1rem;
+    border-radius: 100px;
+    border: 1px solid var(--border-glass);
+    transition: all 0.3s ease;
+}
+
+.developer-badge:hover {
+    background: rgba(212, 175, 55, 0.05);
+    border-color: rgba(212, 175, 55, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.1);
+}
+
+.dev-label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.dev-name {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    background: linear-gradient(to right, var(--accent), #fff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 2px 10px rgba(212, 175, 55, 0.2);
+}
+
+body[data-theme="light"] .dev-name {
+    background: linear-gradient(to right, var(--accent), #1f2d45);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .app-container {
+        padding: 1rem;
+    }
+
+    .app-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .header-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .board-section {
+        padding: 0.5rem;
+    }
+
+    .chess-board-wrapper {
+        padding: 15px;
+    }
+    
+    .coordinates-rank, .coordinates-file {
+        display: none;
+    }
+
+    .player-panel {
+        padding: 0.75rem 1rem;
+    }
+
+    .avatar {
+        width: 36px;
+        height: 36px;
+    }
+
+    .timer {
+        font-size: 1.2rem;
+        right: 1rem;
+        top: 1rem;
+    }
+
+    .history-list {
+        height: 200px;
+    }
+    
+    .promotion-choices {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .modal {
+        width: 90%;
+        max-width: 350px;
+    }
+    
+    .app-footer .footer-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .developer-badge {
+        justify-content: center;
     }
 }

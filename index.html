@@ -30,6 +30,13 @@
                 </div>
             </div>
             <div class="header-actions">
+                <div class="mode-toggle glass">
+                    <label class="switch">
+                        <input type="checkbox" id="ai-toggle">
+                        <span class="slider round"></span>
+                    </label>
+                    <span id="mode-text">Play vs AI</span>
+                </div>
                 <button id="btn-theme" class="btn secondary">
                     <i data-lucide="sun"></i>
                     <span id="theme-button-text">Light Mode</span>
@@ -39,11 +46,25 @@
 
         <main class="game-layout">
             <section class="board-section">
-                <div class="captured-area opponent-captured" id="captured-white">
-                    <!-- Captured white pieces (shown to black) -->
+                <!-- Top Player (Black by default) -->
+                <div class="player-panel opponent-panel" id="player-black">
+                    <div class="player-info">
+                        <img src="https://api.dicebear.com/7.x/bottts/svg?seed=noir" alt="Opponent" class="avatar">
+                        <div class="player-details">
+                            <h3 id="top-player-name">Noir Bot (AI)</h3>
+                            <span class="material-score" id="score-black"></span>
+                        </div>
+                    </div>
+                    <div class="timer" id="timer-black">10:00</div>
+                    <div class="captured-area" id="captured-white">
+                        <!-- Captured white pieces -->
+                    </div>
                 </div>
 
-                <div class="chess-board-wrapper">
+                <div class="chess-board-wrapper" id="board-wrapper">
+                    <button id="btn-fullscreen" class="btn-fullscreen glass" title="Toggle Fullscreen">
+                        <i data-lucide="maximize"></i>
+                    </button>
                     <div id="board" class="chess-board"></div>
                     <div class="coordinates-rank">
                         <span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span><span>1</span>
@@ -53,8 +74,19 @@
                     </div>
                 </div>
 
-                <div class="captured-area player-captured" id="captured-black">
-                    <!-- Captured black pieces (shown to white) -->
+                <!-- Bottom Player (White by default) -->
+                <div class="player-panel player-panel-bottom" id="player-white">
+                    <div class="player-info">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=player" alt="You" class="avatar">
+                        <div class="player-details">
+                            <h3>You</h3>
+                            <span class="material-score" id="score-white"></span>
+                        </div>
+                    </div>
+                    <div class="timer" id="timer-white">10:00</div>
+                    <div class="captured-area" id="captured-black">
+                        <!-- Captured black pieces -->
+                    </div>
                 </div>
             </section>
 
@@ -101,7 +133,13 @@
         </main>
 
         <footer class="app-footer">
-            <p>&copy; 2026 Grandmaster Noir. Designed for Excellence.</p>
+            <div class="footer-content">
+                <p>&copy; 2026 Grandmaster Noir.</p>
+                <div class="developer-badge">
+                    <span class="dev-label">Développé par</span>
+                    <span class="dev-name">Amine Jhilel</span>
+                </div>
+            </div>
         </footer>
     </div>
 
@@ -110,10 +148,26 @@
         <div class="modal glass">
             <h2>Pawn Promotion</h2>
             <div class="promotion-choices">
-                <div class="choice" data-piece="q"><i data-lucide="crown"></i><span>Queen</span></div>
-                <div class="choice" data-piece="r"><i data-lucide="castle"></i><span>Rook</span></div>
-                <div class="choice" data-piece="b"><i data-lucide="swords"></i><span>Bishop</span></div>
-                <div class="choice" data-piece="n"><i data-lucide="horse"></i><span>Knight</span></div>
+                <div class="choice" data-piece="q"><img src="https://upload.wikimedia.org/wikipedia/commons/1/15/Chess_qlt45.svg" alt="Queen"><span>Queen</span></div>
+                <div class="choice" data-piece="r"><img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg" alt="Rook"><span>Rook</span></div>
+                <div class="choice" data-piece="b"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Chess_blt45.svg" alt="Bishop"><span>Bishop</span></div>
+                <div class="choice" data-piece="n"><img src="https://upload.wikimedia.org/wikipedia/commons/7/70/Chess_nlt45.svg" alt="Knight"><span>Knight</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="game-over-modal" class="modal-overlay hidden">
+        <div class="modal glass game-over-modal">
+            <h2 id="game-over-title">Checkmate!</h2>
+            <p id="game-over-message">White wins the game.</p>
+            <div class="game-over-actions">
+                <button id="btn-play-again" class="btn accent">
+                    <i data-lucide="play"></i> Play Again
+                </button>
+                <button id="btn-close-modal" class="btn secondary">
+                    Close
+                </button>
             </div>
         </div>
     </div>

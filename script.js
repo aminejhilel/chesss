@@ -9,13 +9,65 @@ document.addEventListener('DOMContentLoaded', () => {
     let pendingMove = null;
     const modal = document.getElementById('promotion-modal');
 
+    // AI & Settings
+    const aiToggle = document.getElementById('ai-toggle');
+    let aiEnabled = aiToggle.checked;
+    aiToggle.addEventListener('change', (e) => {
+        aiEnabled = e.target.checked;
+        if (aiEnabled && logic.turn === 'b') {
+            setTimeout(makeAIMove, 500);
+        }
+    });
+
+    // Timers
+    let timerInterval = null;
+    let timeWhite = 600; // 10 minutes in seconds
+    let timeBlack = 600;
+    const timerWhiteEl = document.getElementById('timer-white');
+    const timerBlackEl = document.getElementById('timer-black');
+
+    function formatTime(seconds) {
+        const m = Math.floor(seconds / 60);
+        const s = seconds % 60;
+        return `${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    function updateTimers() {
+        if (logic.isGameOver) {
+            clearInterval(timerInterval);
+            return;
+        }
+        if (logic.turn === 'w') {
+            timeWhite--;
+            timerWhiteEl.textContent = formatTime(timeWhite);
+            if (timeWhite <= 30) timerWhiteEl.classList.add('low-time');
+            if (timeWhite <= 0) handleTimeOut('w');
+        } else {
+            timeBlack--;
+            timerBlackEl.textContent = formatTime(timeBlack);
+            if (timeBlack <= 30) timerBlackEl.classList.add('low-time');
+            if (timeBlack <= 0) handleTimeOut('b');
+        }
+    }
+
+    function handleTimeOut(color) {
+        clearInterval(timerInterval);
+        ui.playSound('gameover');
+        ui.showGameOverModal('Time Out', color === 'w' ? 'b' : 'w');
+    }
+
+    function startTimers() {
+        clearInterval(timerInterval);
+        timerInterval = setInterval(updateTimers, 1000);
+    }
+
     function handleSquareClick(square) {
         const moves = logic.getValidMoves(ui.selectedSquare);
 
         // If clicking on already selected square, deselect
         if (ui.selectedSquare === square) {
             ui.selectedSquare = null;
-            ui.render(logic.getBoard());
+            ui.render(logic.getBoard(), [], logic.status === 'Check' ? logic.getKingSquare(logic.turn) : null);
             return;
         }
 
@@ -41,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ui.render(logic.getBoard(), legalMoves);
         } else {
             ui.selectedSquare = null;
-            ui.render(logic.getBoard());
+            ui.render(logic.getBoard(), [], logic.status === 'Check' ? logic.getKingSquare(logic.turn) : null);
         }
     }
 
@@ -90,18 +142,55 @@ document.addEventListener('DOMContentLoaded', () => {
             ui.lastMove = move;
             updateGame();
             saveGame();
+            startTimers(); // Start or restart timers on move
+
+            if (aiEnabled && logic.turn === 'b' && !logic.isGameOver) {
+                setTimeout(makeAIMove, 500); // Add a small delay for realism
+            }
+        }
+    }
+
+    function makeAIMove() {
+        const bestMove = logic.getBestMove();
+        if (bestMove) {
+            const move = logic.makeMove(bestMove);
+            if (move) {
+                if (logic.game.in_checkmate()) ui.playSound('gameover');
+                else if (logic.game.in_check()) ui.playSound('check');
+                else if (move.captured) ui.playSound('capture');
+                else ui.playSound('move');
+
+                ui.selectedSquare = null;
+                ui.lastMove = move;
+                updateGame();
+                saveGame();
+                startTimers();
+            }
         }
     }
 
     function updateGame() {
-        ui.render(logic.getBoard());
+        const isCheck = logic.status === 'Check' || logic.status === 'Checkmate';
+        const kingSquare = isCheck ? logic.getKingSquare(logic.turn) : null;
+        
+        ui.render(logic.getBoard(), [], kingSquare);
         ui.updateHistory(logic.history);
         ui.updateCaptured(logic.history);
+        ui.updateMaterialScore(logic.getMaterialScore());
 
         const turn = logic.turn === 'w' ? "White's Turn" : "Black's Turn";
         const status = logic.status;
         const statusText = status ? `${turn} (${status})` : turn;
-        ui.updateStatus(statusText, logic.status === 'Check' || logic.status === 'Checkmate');
+        ui.updateStatus(statusText, isCheck);
+
+        if (logic.isGameOver) {
+            clearInterval(timerInterval);
+            let winner = null;
+            if (logic.game.in_checkmate()) {
+                winner = logic.turn === 'w' ? 'b' : 'w';
+            }
+            ui.showGameOverModal(status, winner);
+        }
 
         // Update phase
         const moveCount = logic.history.length;
@@ -111,15 +200,21 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('game-phase').textContent = phase;
     }
 
-    // Initialize UI
     ui = new ChessUI('board', handleSquareClick);
     loadThemePreference();
     loadGame(); // Try to load saved game
-    if (!localStorage.getItem('chess_game_pgn')) ui.render(logic.getBoard());
+    if (!localStorage.getItem('chess_game_pgn')) {
+        ui.render(logic.getBoard());
+        ui.updateMaterialScore(logic.getMaterialScore());
+    }
 
     // Controls
     document.getElementById('btn-undo').addEventListener('click', () => {
         logic.undo();
+        if (aiEnabled && logic.turn === 'b') {
+            // Undo twice if playing against AI to get back to user's turn
+            logic.undo();
+        }
         ui.lastMove = logic.history[logic.history.length - 1] || null;
         updateGame();
         saveGame();
@@ -130,8 +225,50 @@ document.addEventListener('DOMContentLoaded', () => {
             logic.reset();
             ui.lastMove = null;
             ui.selectedSquare = null;
+            timeWhite = 600;
+            timeBlack = 600;
+            timerWhiteEl.textContent = formatTime(timeWhite);
+            timerBlackEl.textContent = formatTime(timeBlack);
+            timerWhiteEl.classList.remove('low-time');
+            timerBlackEl.classList.remove('low-time');
+            clearInterval(timerInterval);
+            document.getElementById('game-over-modal').classList.add('hidden');
             updateGame();
             localStorage.removeItem('chess_game_pgn');
+        }
+    });
+
+    // Close Game Over Modal
+    document.getElementById('btn-close-modal').addEventListener('click', () => {
+        document.getElementById('game-over-modal').classList.add('hidden');
+    });
+
+    // Play Again from Modal
+    document.getElementById('btn-play-again').addEventListener('click', () => {
+        document.getElementById('btn-reset').click();
+    });
+
+    // Fullscreen Toggle
+    const btnFullscreen = document.getElementById('btn-fullscreen');
+    const boardWrapper = document.getElementById('board-wrapper');
+    const fullscreenIcon = btnFullscreen.querySelector('i');
+
+    function toggleFullscreen() {
+        boardWrapper.classList.toggle('fullscreen-mode');
+        if (boardWrapper.classList.contains('fullscreen-mode')) {
+            fullscreenIcon.setAttribute('data-lucide', 'minimize');
+        } else {
+            fullscreenIcon.setAttribute('data-lucide', 'maximize');
+        }
+        lucide.createIcons();
+    }
+
+    btnFullscreen.addEventListener('click', toggleFullscreen);
+
+    // Close fullscreen on Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && boardWrapper.classList.contains('fullscreen-mode')) {
+            toggleFullscreen();
         }
     });
 

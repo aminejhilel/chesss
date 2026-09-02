@@ -41,7 +41,7 @@ class ChessUI {
         }
     }
 
-    render(boardState, legalMoves = []) {
+    render(boardState, legalMoves = [], kingInCheckSquare = null) {
         this.boardElement.innerHTML = '';
 
         for (let r = 0; r < 8; r++) {
@@ -58,6 +58,9 @@ class ChessUI {
                 if (this.lastMove && (this.lastMove.from === squareName || this.lastMove.to === squareName)) {
                     square.classList.add('last-move');
                 }
+                if (kingInCheckSquare === squareName) {
+                    square.classList.add('in-check');
+                }
 
                 const piece = boardState[r][c];
                 if (piece) {
@@ -71,9 +74,14 @@ class ChessUI {
                 }
 
                 // Legal move hints
-                if (legalMoves.some(m => m.to === squareName)) {
+                const moveHint = legalMoves.find(m => m.to === squareName);
+                if (moveHint) {
                     const hintTask = document.createElement('div');
                     hintTask.className = 'legal-move-hint';
+                    // If it's a capture, use a different style (ring)
+                    if (moveHint.flags.includes('c') || moveHint.flags.includes('e')) {
+                        hintTask.classList.add('capture');
+                    }
                     square.appendChild(hintTask);
                 }
 
@@ -135,6 +143,34 @@ class ChessUI {
         captured.b.forEach(type => {
             capturedBlack.innerHTML += `<img src="${this.pieceImages['b'][type]}" class="captured-piece">`;
         });
+    }
+
+    updateMaterialScore(scores) {
+        const whiteScoreEl = document.getElementById('score-white');
+        const blackScoreEl = document.getElementById('score-black');
+        
+        let wDiff = scores.w - scores.b;
+        let bDiff = scores.b - scores.w;
+
+        whiteScoreEl.textContent = wDiff > 0 ? `+${wDiff}` : '';
+        blackScoreEl.textContent = bDiff > 0 ? `+${bDiff}` : '';
+    }
+
+    showGameOverModal(status, winner) {
+        const modal = document.getElementById('game-over-modal');
+        const title = document.getElementById('game-over-title');
+        const message = document.getElementById('game-over-message');
+
+        modal.classList.remove('hidden');
+        title.textContent = status;
+        
+        if (winner === 'w') {
+            message.textContent = "White wins the game.";
+        } else if (winner === 'b') {
+            message.textContent = "Black wins the game.";
+        } else {
+            message.textContent = "The game is a draw.";
+        }
     }
 }
 

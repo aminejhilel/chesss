@@ -105,6 +105,14 @@
                             <span class="label">Phase</span>
                             <span id="game-phase" class="value">Opening</span>
                         </div>
+                        <div class="info-item">
+                            <span class="label">Move</span>
+                            <span id="move-number" class="value">1</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="label">Advantage</span>
+                            <span id="material-advantage" class="value">Even</span>
+                        </div>
                     </div>
                 </div>
 
@@ -125,8 +133,14 @@
                     <button id="btn-reset" class="btn danger">
                         <i data-lucide="rotate-ccw"></i> Reset
                     </button>
-                    <button id="btn-settings" class="btn icon-only glass">
-                        <i data-lucide="settings"></i>
+                    <button id="btn-flip" class="btn icon-only glass" title="Flip board" aria-label="Flip board">
+                        <i data-lucide="refresh-cw"></i>
+                    </button>
+                    <button id="btn-copy-pgn" class="btn icon-only glass" title="Copy PGN" aria-label="Copy PGN">
+                        <i data-lucide="copy"></i>
+                    </button>
+                    <button id="btn-sound" class="btn icon-only glass" title="Mute sounds" aria-label="Mute sounds">
+                        <i data-lucide="volume-2"></i>
                     </button>
                 </div>
             </aside>
@@ -148,10 +162,18 @@
         <div class="modal glass">
             <h2>Pawn Promotion</h2>
             <div class="promotion-choices">
-                <div class="choice" data-piece="q"><img src="https://upload.wikimedia.org/wikipedia/commons/1/15/Chess_qlt45.svg" alt="Queen"><span>Queen</span></div>
-                <div class="choice" data-piece="r"><img src="https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg" alt="Rook"><span>Rook</span></div>
-                <div class="choice" data-piece="b"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Chess_blt45.svg" alt="Bishop"><span>Bishop</span></div>
-                <div class="choice" data-piece="n"><img src="https://upload.wikimedia.org/wikipedia/commons/7/70/Chess_nlt45.svg" alt="Knight"><span>Knight</span></div>
+                <div class="choice" data-piece="q"><img
+                        src="https://upload.wikimedia.org/wikipedia/commons/1/15/Chess_qlt45.svg"
+                        alt="Queen"><span>Queen</span></div>
+                <div class="choice" data-piece="r"><img
+                        src="https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg"
+                        alt="Rook"><span>Rook</span></div>
+                <div class="choice" data-piece="b"><img
+                        src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Chess_blt45.svg"
+                        alt="Bishop"><span>Bishop</span></div>
+                <div class="choice" data-piece="n"><img
+                        src="https://upload.wikimedia.org/wikipedia/commons/7/70/Chess_nlt45.svg"
+                        alt="Knight"><span>Knight</span></div>
             </div>
         </div>
     </div>

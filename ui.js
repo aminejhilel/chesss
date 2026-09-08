@@ -32,10 +32,12 @@ class ChessUI {
         };
         this.selectedSquare = null;
         this.lastMove = null;
+        this.orientation = 'white';
+        this.soundEnabled = true;
     }
 
     playSound(type) {
-        if (this.sounds[type]) {
+        if (this.soundEnabled && this.sounds[type]) {
             this.sounds[type].currentTime = 0;
             this.sounds[type].play().catch(() => { });
         }
@@ -44,8 +46,11 @@ class ChessUI {
     render(boardState, legalMoves = [], kingInCheckSquare = null) {
         this.boardElement.innerHTML = '';
 
-        for (let r = 0; r < 8; r++) {
-            for (let c = 0; c < 8; c++) {
+        const rows = this.orientation === 'white' ? [0, 1, 2, 3, 4, 5, 6, 7] : [7, 6, 5, 4, 3, 2, 1, 0];
+        const columns = this.orientation === 'white' ? [0, 1, 2, 3, 4, 5, 6, 7] : [7, 6, 5, 4, 3, 2, 1, 0];
+
+        for (const r of rows) {
+            for (const c of columns) {
                 const squareName = this.getSquareName(r, c);
                 const square = document.createElement('div');
                 const isLight = (r + c) % 2 === 0;
@@ -89,6 +94,16 @@ class ChessUI {
                 this.boardElement.appendChild(square);
             }
         }
+    }
+
+    flipBoard() {
+        this.orientation = this.orientation === 'white' ? 'black' : 'white';
+        const ranks = document.querySelectorAll('.coordinates-rank span');
+        const files = document.querySelectorAll('.coordinates-file span');
+        const rankValues = this.orientation === 'white' ? ['8', '7', '6', '5', '4', '3', '2', '1'] : ['1', '2', '3', '4', '5', '6', '7', '8'];
+        const fileValues = this.orientation === 'white' ? ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] : ['h', 'g', 'f', 'e', 'd', 'c', 'b', 'a'];
+        ranks.forEach((rank, index) => { rank.textContent = rankValues[index]; });
+        files.forEach((file, index) => { file.textContent = fileValues[index]; });
     }
 
     getSquareName(row, col) {
@@ -148,7 +163,7 @@ class ChessUI {
     updateMaterialScore(scores) {
         const whiteScoreEl = document.getElementById('score-white');
         const blackScoreEl = document.getElementById('score-black');
-        
+
         let wDiff = scores.w - scores.b;
         let bDiff = scores.b - scores.w;
 
@@ -163,7 +178,7 @@ class ChessUI {
 
         modal.classList.remove('hidden');
         title.textContent = status;
-        
+
         if (winner === 'w') {
             message.textContent = "White wins the game.";
         } else if (winner === 'b') {

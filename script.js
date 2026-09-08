@@ -172,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateGame() {
         const isCheck = logic.status === 'Check' || logic.status === 'Checkmate';
         const kingSquare = isCheck ? logic.getKingSquare(logic.turn) : null;
-        
+
         ui.render(logic.getBoard(), [], kingSquare);
         ui.updateHistory(logic.history);
         ui.updateCaptured(logic.history);
@@ -198,6 +198,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (moveCount > 30) phase = 'Endgame';
         else if (moveCount > 10) phase = 'Middle Game';
         document.getElementById('game-phase').textContent = phase;
+        document.getElementById('move-number').textContent = Math.floor(moveCount / 2) + 1;
+
+        const scores = logic.getMaterialScore();
+        const difference = scores.w - scores.b;
+        const advantage = document.getElementById('material-advantage');
+        advantage.textContent = difference === 0 ? 'Even' : `${difference > 0 ? 'White' : 'Black'} +${Math.abs(difference)}`;
+        advantage.classList.toggle('positive', difference !== 0);
     }
 
     ui = new ChessUI('board', handleSquareClick);
@@ -246,6 +253,34 @@ document.addEventListener('DOMContentLoaded', () => {
     // Play Again from Modal
     document.getElementById('btn-play-again').addEventListener('click', () => {
         document.getElementById('btn-reset').click();
+    });
+
+    document.getElementById('btn-flip').addEventListener('click', () => {
+        ui.flipBoard();
+        ui.render(logic.getBoard(), [], logic.status === 'Check' ? logic.getKingSquare(logic.turn) : null);
+    });
+
+    document.getElementById('btn-copy-pgn').addEventListener('click', async () => {
+        try {
+            await navigator.clipboard.writeText(logic.game.pgn() || 'No moves yet');
+            const button = document.getElementById('btn-copy-pgn');
+            button.classList.add('copied');
+            button.title = 'PGN copied';
+            setTimeout(() => {
+                button.classList.remove('copied');
+                button.title = 'Copy PGN';
+            }, 1400);
+        } catch (error) {
+            window.prompt('Copy this PGN:', logic.game.pgn());
+        }
+    });
+
+    document.getElementById('btn-sound').addEventListener('click', (event) => {
+        ui.soundEnabled = !ui.soundEnabled;
+        const icon = event.currentTarget.querySelector('svg');
+        icon.setAttribute('data-lucide', ui.soundEnabled ? 'volume-2' : 'volume-x');
+        event.currentTarget.title = ui.soundEnabled ? 'Mute sounds' : 'Enable sounds';
+        lucide.createIcons();
     });
 
     // Fullscreen Toggle

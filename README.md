@@ -118,6 +118,9 @@ Dans les prochaines versions, il serait possible d'ajouter :
 * 🔔 Notifications
 * 🎨 Animations avancées
 
+* <img width="1401" height="902" alt="image" src="https://github.com/user-attachments/assets/11ba2c2c-5823-4bb1-bcdb-79f3db7026a0" />
+
+
 ## 👨‍💻 Auteur
 
 **Amine Jhilel**

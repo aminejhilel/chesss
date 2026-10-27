@@ -1,5 +1,5 @@
 # 🚀 JavaScript LocalStorage App
---------------------------------
+----------------------------------
 Une application web moderne développée uniquement avec **HTML, CSS et JavaScript**, avec **LocalStorage** pour sauvegarder les données directement dans le navigateur.
 
 ## 📌 Description
